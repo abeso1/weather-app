@@ -230,6 +230,7 @@ class _MainViewState extends State<MainView> {
           if (isLandscape) _details(weatherDay)
         ],
       ),
+      if (!isLandscape) _details(weatherDay),
       Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 4,
@@ -244,7 +245,6 @@ class _MainViewState extends State<MainView> {
               fontWeight: FontWeight.bold,
             )),
       ),
-      if (!isLandscape) _details(weatherDay)
     ]);
   }
 
