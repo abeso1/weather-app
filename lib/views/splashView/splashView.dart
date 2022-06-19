@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/services/splashServices.dart';
 
 class SplashView extends StatefulWidget {
   @override
@@ -6,6 +7,12 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  @override
+  void initState() {
+    super.initState();
+    SplashServices.splashInitialization(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
