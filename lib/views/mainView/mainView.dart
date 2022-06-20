@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/models/WeatherDay.dart';
 import 'package:weather_app/services/weatherServices.dart';
+import 'package:weather_app/store/settingsStore.dart';
 import 'package:weather_app/store/weatherStore.dart';
+import 'package:weather_app/views/mainView/widgets/temperatureUnitsToggle.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -158,71 +160,75 @@ class _MainViewState extends State<MainView> {
         });
   }
 
-  InkWell _listItem(
+  StreamBuilder _listItem(
       List<WeatherDay> weathers, int index, DateTime? selectedDay) {
-    return InkWell(
-      onTap: () {
-        weatherStore.setSelectedDay(weathers[index].dateTime!);
-      },
-      child: Container(
-        height: 180,
-        width: 120,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: selectedDay == null ||
-                  !selectedDay.isAtSameMomentAs(weathers[index].dateTime!)
-              ? null
-              : Border.all(
-                  width: 1,
-                  color: Colors.blue,
-                ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 2.0,
-              offset: Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              DateFormat(DateFormat.ABBR_WEEKDAY)
-                  .format(weathers[index].dateTime!),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+    return StreamBuilder(
+        stream: settingsStore.temperaturesUnit$,
+        builder: (context, snapshot) {
+          return InkWell(
+            onTap: () {
+              weatherStore.setSelectedDay(weathers[index].dateTime!);
+            },
+            child: Container(
+              height: 180,
+              width: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: selectedDay == null ||
+                        !selectedDay.isAtSameMomentAs(weathers[index].dateTime!)
+                    ? null
+                    : Border.all(
+                        width: 1,
+                        color: Colors.blue,
+                      ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 2.0,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    DateFormat(DateFormat.ABBR_WEEKDAY)
+                        .format(weathers[index].dateTime!),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Image.network(
+                    "http://openweathermap.org/img/wn/${weathers[index].weatherIcon}@2x.png",
+                    height: 70,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    settingsStore.getTemperatureString(weathers[index].min!) +
+                        " / " +
+                        settingsStore
+                            .getTemperatureString(weathers[index].max!),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Image.network(
-              "http://openweathermap.org/img/wn/${weathers[index].weatherIcon}@2x.png",
-              height: 70,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              weathers[index].min!.toStringAsFixed(0) +
-                  "°C / " +
-                  weathers[index].max!.toStringAsFixed(0) +
-                  "°C",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Column _buildWeatherDetails(isLandscape) {
@@ -263,14 +269,18 @@ class _MainViewState extends State<MainView> {
           vertical: 4,
           horizontal: 20,
         ),
-        child: Text(
-            "Current temperature: " +
-                weatherStore.currentTemperature!.toStringAsFixed(1) +
-                "°C",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
+        child: StreamBuilder(
+            stream: settingsStore.temperaturesUnit$,
+            builder: (context, snapshot) {
+              return Text(
+                  "Current temperature: " +
+                      settingsStore.getTemperatureString(
+                          weatherStore.currentTemperature!),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ));
+            }),
       ),
     ]);
   }
@@ -354,6 +364,9 @@ class _MainViewState extends State<MainView> {
       centerTitle: false,
       title: Text("Weather App", style: TextStyle(color: Colors.black)),
       backgroundColor: Colors.white,
+      actions: [
+        TemperatureUnitsToggle(),
+      ],
     );
   }
 }

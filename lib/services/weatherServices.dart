@@ -12,7 +12,7 @@ class WeatherServices {
           "http://api.openweathermap.org/geo/1.0/direct?q=$city&appid=303cecad711f8ffd443d30316be9b2d1");
 
       List dec = response1.data;
-      print(dec);
+      
       if (dec.isEmpty) {
         weatherStore.setFetchingError("The city you entered does not exist!");
         return;
