@@ -94,6 +94,33 @@ class _MainViewState extends State<MainView> {
             stream: weatherStore.weatherForAWeek$,
             builder: (context, AsyncSnapshot<List<WeatherDay>?> snapshot) {
               List<WeatherDay>? weathers = snapshot.data ?? [];
+              if (weathers.isEmpty && weatherStore.fetchingError != null)
+                return Container(
+                  height: 300,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(weatherStore.fetchingError!),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        child: Text("Reload"),
+                        onPressed: () {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          WeatherServices.getWeatherInfoForCity(searchText!)
+                              .then((value) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
               return Column(
                 children: [
                   Container(
