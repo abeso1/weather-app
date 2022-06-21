@@ -1,6 +1,6 @@
 # weather_app
 
-Flutter application as a task.
+Flutter application.
 
 ## Getting Started
 
